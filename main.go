@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -24,7 +25,8 @@ var ctx = context.TODO()
 
 func init() {
 
-	uri := "mongodb+srv://dbUser:SLJaApkRw8C8GVXA@clusterx.aujay.mongodb.net/skt>?retryWrites=true&w=majority"
+	uri := os.Getenv("MONGODB_URI")
+	//fmt.Println("URI:", uri)
 
 	fmt.Println("init - connecting")
 	clientOptions := options.Client().ApplyURI(uri)
@@ -61,7 +63,7 @@ func init() {
 
 func (app *applicationX) connectToMongo() error {
 
-	uri := "mongodb+srv://dbUser:SLJaApkRw8C8GVXA@clusterx.aujay.mongodb.net/skt>?retryWrites=true&w=majority"
+	uri := os.Getenv("MONGODB_URI")
 	fmt.Println("connecting to mongo...")
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
@@ -116,3 +118,17 @@ func main() {
 	// }
 	// fmt.Println(databases)
 }
+
+/*
+
+  import "go.mongodb.org/mongo-driver/mongo"
+
+  ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+  defer cancel()
+  client, err := mongo.Connect(ctx, options.Client().ApplyURI(
+
+  ))
+  if err != nil { log.Fatal(err) }
+
+
+*/
