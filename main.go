@@ -18,47 +18,8 @@ type applicationX struct {
 	dbClient  *mongo.Client
 	database  *mongo.Database
 	cc        *controllers.CustomerController
-}
-
-//var collection *mongo.Collection
-var ctx = context.TODO()
-
-func init() {
-
-	// uri := os.Getenv("MONGODB_URI")
-	// //fmt.Println("URI:", uri)
-
-	// fmt.Println("init - connecting")
-	// clientOptions := options.Client().ApplyURI(uri)
-	// client, err := mongo.Connect(ctx, clientOptions)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// err = client.Ping(ctx, nil)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// fmt.Println("connected.")
-
-	// databases, err := client.ListDatabaseNames(ctx, bson.M{})
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(databases)
-	// //collection = client.Database("tasker").Collection("tasks")
-
-	// db := client.Database("skt")
-	// if db == nil {
-	// 	log.Fatal("no db")
-	// }
-	// collections, err := db.ListCollections(ctx, bson.M{}) //.forEach( function(collection) { fmt.Println(collection);
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(collections)
-
+	tc        *controllers.TransactionController
+	kc        *controllers.KegController
 }
 
 func (app *applicationX) connectToMongo() error {
@@ -87,16 +48,6 @@ func (app *applicationX) connectToMongo() error {
 	app.dbClient = client
 	app.database = client.Database("skt")
 
-	// this doesnt work: docs say you can pass
-	// filter := bson.D{}
-	// cnames, err := app.database.ListCollectionNames(ctx, filter)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// for _, name := range cnames {
-	// 	fmt.Println(name)
-	// }
-
 	fmt.Println("Connected to MongoDB")
 
 	return nil
@@ -113,6 +64,10 @@ func (app *applicationX) disconnectDB() {
 func (app *applicationX) initControllers() error {
 
 	app.cc = controllers.NewCustomerController(app.database.Collection("customers"))
+
+	app.tc = controllers.NewTransactionController(app.database.Collection("transactions"))
+
+	app.kc = controllers.NewKegController(app.database.Collection("kegs"))
 
 	return nil
 }
@@ -132,17 +87,3 @@ func main() {
 	app.initRoutes()
 
 }
-
-/*
-
-  import "go.mongodb.org/mongo-driver/mongo"
-
-  ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-  defer cancel()
-  client, err := mongo.Connect(ctx, options.Client().ApplyURI(
-
-  ))
-  if err != nil { log.Fatal(err) }
-
-
-*/

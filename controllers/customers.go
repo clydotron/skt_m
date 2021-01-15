@@ -3,8 +3,10 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/clydotron/skt_mongo/models"
 	"github.com/gin-gonic/gin"
@@ -26,8 +28,6 @@ func NewCustomerController(c *mongo.Collection) *CustomerController {
 // CreateCustomer w
 func (cc *CustomerController) CreateCustomer(c *gin.Context) {
 
-	//fmt.Println(c.Request.Body)
-
 	customer := models.Customer{}
 	json.NewDecoder(c.Request.Body).Decode(&customer)
 
@@ -37,7 +37,7 @@ func (cc *CustomerController) CreateCustomer(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 		return
-	}
+	} //@todo
 
 	// should we use the customer from the response?
 	c.JSON(http.StatusCreated, customer)
@@ -132,4 +132,72 @@ func (cc *CustomerController) DeleteCustomer(c *gin.Context) {
 	} else {
 		c.String(http.StatusNotFound, "Customer not found")
 	}
+}
+
+func (cc *CustomerController) PurchaseKeg(c *gin.Context) {
+
+	objID, ok := extractId(c)
+	if !ok {
+		return
+	}
+
+	// decode the keg purchase data
+	kp := models.KegPurchase{}
+	json.NewDecoder(c.Request.Body).Decode(&kp)
+	kp.TimeStamp = time.Now()
+
+	filter := bson.M{"_id": objID}
+	action := bson.M{"$addToSet": bson.M{"kegs": kp}}
+
+	result, err := cc.collection.UpdateOne(context.Background(), filter, action)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "UpdateOne failed.")
+		return
+	}
+
+	if result.ModifiedCount == 1 {
+		val := fmt.Sprintln("Keg purcahsed:", kp.KegID)
+		c.String(http.StatusOK, val)
+	} else {
+		c.String(http.StatusNoContent, "Nothing...")
+	}
+}
+
+// ReturnKeg
+func (cc *CustomerController) ReturnKeg(c *gin.Context) {
+
+	objID, ok := extractId(c)
+	if !ok {
+		return
+	}
+
+	// decode the keg purchase data, we only care about the kegid
+	kp := models.KegPurchase{}
+	json.NewDecoder(c.Request.Body).Decode(&kp)
+
+	filter := bson.M{"_id": objID}
+	action := bson.M{"$pull": bson.M{"kegs": bson.M{"kegid": kp.KegID}}}
+
+	result, err := cc.collection.UpdateOne(context.Background(), filter, action)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "UpdateOne failed.")
+		return
+	}
+
+	if result.ModifiedCount == 1 {
+		val := fmt.Sprintln("Keg returned:", kp.KegID)
+		c.String(http.StatusOK, val)
+	} else {
+		c.String(http.StatusNoContent, "Nothing removed...")
+	}
+}
+
+// KegTransaction
+func (cc *CustomerController) KegTransaction(c *gin.Context) {
+	//could switch on the action, the only thing that changes is the action string
+
+	// taction := c.Param("action")
+	// switch taction
+	// case "\"
+
 }

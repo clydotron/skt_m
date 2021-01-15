@@ -30,7 +30,31 @@ func (app *applicationX) initRoutes() {
 		cg.PATCH("/:id", app.cc.UpdateCustomer)
 		cg.POST("/", app.cc.CreateCustomer)
 		cg.DELETE("/:id", app.cc.DeleteCustomer)
+		cg.POST("/purchase/:id", app.cc.PurchaseKeg)
+		cg.POST("/return/:id", app.cc.ReturnKeg)
+		//cg.POST("/:id/*action", app.cc.KegTransaction)
 	}
+
+	tg := router.Group("/api/v1/transaction")
+	{
+		tg.POST("/", app.tc.CreateTransaction)
+		tg.GET("/:id", app.tc.GetTransaction)
+		//cg.POST("/purchase", app.tc.PurchaseKeg)
+		//cg.POST("/return", app.tc.ReturnKeg)
+		// add the remaining CRUD
+	}
+	router.GET("/api/v1/transactions", app.tc.GetAllTransactions)
+
+	kg := router.Group("/api/v1/keg")
+	{
+		kg.POST("/", app.kc.CreateKeg)
+		kg.GET("/:id", app.kc.GetKeg)
+		kg.POST("/:id/*action", app.kc.HandleKegAction)
+		//kg.GET("/index", app.kc.GetAllKegs)
+		kg.DELETE("/:id", app.kc.DeleteKeg)
+
+	}
+	router.GET("/api/v1/kegs", app.kc.GetAllKegs)
 
 	router.Run()
 }
