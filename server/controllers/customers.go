@@ -37,7 +37,7 @@ func (cc *CustomerController) CreateCustomer(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 		return
-	} //@todo
+	} //@todo use c.String
 
 	// should we use the customer from the response?
 	c.JSON(http.StatusCreated, customer)
@@ -92,20 +92,26 @@ func (cc *CustomerController) UpdateCustomer(c *gin.Context) {
 
 	objID, ok := extractId(c)
 	if !ok {
+		fmt.Println("extractId failed")
 		return
 	}
 
 	customer := models.Customer{}
 	json.NewDecoder(c.Request.Body).Decode(&customer)
+	customer.ID = objID
 
+	fmt.Println("updating", customer)
 	result, err := cc.collection.ReplaceOne(context.Background(), bson.M{"_id": objID}, customer)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "ReplaceOne failed")
+		fmt.Println("replaceOne failed...")
+		fmt.Println(err)
 		return
 	}
 	//check the result?
 	if result.MatchedCount == 1 {
 		c.JSON(http.StatusOK, customer)
+		fmt.Println("success")
 	} else {
 		c.String(http.StatusNotFound, "customer not found")
 	}
@@ -156,7 +162,7 @@ func (cc *CustomerController) PurchaseKeg(c *gin.Context) {
 	}
 
 	if result.ModifiedCount == 1 {
-		val := fmt.Sprintln("Keg purcahsed:", kp.KegID)
+		val := fmt.Sprintln("Keg purchased:", kp.KegID)
 		c.String(http.StatusOK, val)
 	} else {
 		c.String(http.StatusNoContent, "Nothing...")
@@ -175,6 +181,8 @@ func (cc *CustomerController) ReturnKeg(c *gin.Context) {
 	kp := models.KegPurchase{}
 	json.NewDecoder(c.Request.Body).Decode(&kp)
 
+	fmt.Println("ReturnKeg:", kp)
+
 	filter := bson.M{"_id": objID}
 	action := bson.M{"$pull": bson.M{"kegs": bson.M{"kegid": kp.KegID}}}
 
@@ -192,12 +200,17 @@ func (cc *CustomerController) ReturnKeg(c *gin.Context) {
 	}
 }
 
-// KegTransaction
+// KegTransaction handle the the various keg actions: purchase, return
 func (cc *CustomerController) KegTransaction(c *gin.Context) {
-	//could switch on the action, the only thing that changes is the action string
 
-	// taction := c.Param("action")
-	// switch taction
-	// case "\"
+	fmt.Println(c.Param("action"))
+	switch c.Param("action") {
+	case "/purchase":
+		cc.PurchaseKeg(c)
+	case "/return":
+		cc.ReturnKeg(c)
+	default:
+		c.String(http.StatusBadRequest, "Unsupported action:")
+	}
 
 }
