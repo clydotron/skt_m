@@ -49,7 +49,7 @@ class KegList extends React.Component {
     render() {
         return (
             <div>
-                <h2>Kegsz</h2>
+                <h2>Kegs</h2>
                 <div className="ui celled list">
                     {this.renderList()}
                 </div>

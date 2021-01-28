@@ -9,3 +9,11 @@ export const EDIT_CUSTOMER = "EDIT_CUSTOMER";
 
 export const RETURN_KEG = "RETURN_KEG";
 export const PURCHASE_KEG = "PURCHASE_KEG";
+
+export const CREATE_KEG = "CREATE_KEG";
+export const FETCH_KEG = "FETCH_KEG";
+export const FETCH_KEGS = "FETCH_KEGS";
+export const DELETE_KEG = "DELETE_KEG";
+export const EDIT_KEG = "EDIT_KEG";
+
+export const CREATE_BEER = "CREATE_BEER";

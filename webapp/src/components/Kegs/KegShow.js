@@ -10,7 +10,7 @@ class KegShow extends React.Component {
     }
 
     renderDetails = (details) => {
-        const output = {}
+        //const output = {}
         details.map(data => {
             console.log(data["Key"],data["Value"]);
         })

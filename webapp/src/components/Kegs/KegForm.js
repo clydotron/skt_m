@@ -34,6 +34,37 @@ class KegForm extends React.Component {
                <Field name="code" component={this.renderInput} label="Enter coded ID" />
                <Field name="size" component={this.renderInput} label="Enter size in gallons"/>
                
+                <div>
+                    <label>Keg Size (in US Gallons)</label>
+                    <div className="ui list">
+                        <div>
+
+             
+                        <label className="ui content">
+                            <Field
+                            name="kegsize"
+                            component="input"
+                            type="radio"
+                            value="gallons_5"
+                            />{' '}
+                            5
+                        </label>
+                        </div>
+                        <div>         
+                            <label className="ui content">
+                                <Field
+                                name="kegsize"
+                                component="input"
+                                type="radio"
+                                value="gallons_15"
+                                />{' '}
+                                15
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+
             <button className="ui button primary">Submit</button>
            </form>
         )
@@ -63,14 +94,16 @@ export default reduxForm({
         <div class="grouped fields">
           <div class="field">
             <div class="ui radio checkbox">
-              <input type="radio" name="size" value="15">
+              <input type="radio" name="size" value="gallons_5">
               <label>5</label>
             </div>
           </div>
           <div class="field">
             <div class="ui radio checkbox">
-              <input type="radio" name="size" value="medium">
-              <label>Medium</label>
+              <input type="radio" name="size" value="gallons_15">
+              <label>15</label>
             </div>
           </div>
           */
+
+  
