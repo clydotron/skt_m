@@ -20,6 +20,7 @@ type applicationX struct {
 	cc        *controllers.CustomerController
 	tc        *controllers.TransactionController
 	kc        *controllers.KegController
+	bc        *controllers.BrewController
 }
 
 func (app *applicationX) connectToMongo() error {
@@ -64,10 +65,9 @@ func (app *applicationX) disconnectDB() {
 func (app *applicationX) initControllers() error {
 
 	app.cc = controllers.NewCustomerController(app.database.Collection("customers"))
-
 	app.tc = controllers.NewTransactionController(app.database.Collection("transactions"))
-
 	app.kc = controllers.NewKegController(app.database.Collection("kegs"))
+	app.bc = controllers.NewBrewController(app.database.Collection("brews"))
 
 	return nil
 }

@@ -88,9 +88,99 @@ func (kc *KegController) GetAllKegs(c *gin.Context) {
 	c.JSON(http.StatusOK, kegs)
 }
 
-func (kc *KegController) HandleKegAction(c *gin.Context) {
-	//action := c.Param("action")
+// FillKeg ...
+func (kc *KegController) FillKeg(c *gin.Context) {
 
+	objID, ok := extractId(c)
+	if !ok {
+		return
+	}
+
+	kfi := models.KegFillInfo{}
+	json.NewDecoder(c.Request.Body).Decode(&kfi)
+	fmt.Println("Fill", kfi)
+
+	filter := bson.M{"_id": objID}
+	update := bson.M{"$set": bson.M{"BrewID": kfi.BrewID}}
+
+	result, err := kc.collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if result.MatchedCount == 1 {
+		if result.ModifiedCount == 1 {
+			c.String(http.StatusOK, "Keg filled.")
+		} else {
+			c.String(http.StatusNotModified, "Keg filled status unchanged.")
+		}
+	} else {
+		c.String(http.StatusNotFound, "Keg fill: keg not found")
+	}
+}
+
+// ResetHistory ...
+func (kc *KegController) ResetHistory(c *gin.Context) {
+
+	objID, ok := extractId(c)
+	if !ok {
+		return
+	}
+
+	kfi := models.KegFillInfo{}
+	json.NewDecoder(c.Request.Body).Decode(&kfi)
+	fmt.Println("Fill", kfi)
+
+	emptyHistory := []models.KegInfo{}
+
+	filter := bson.M{"_id": objID}
+	update := bson.M{"$set": bson.M{"History": emptyHistory}}
+
+	result, err := kc.collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// make sure the results are what we expect:
+	c.JSON(http.StatusOK, result)
+}
+
+// DrainKeg ...
+func (kc *KegController) DrainKeg(c *gin.Context) {
+
+	objID, ok := extractId(c)
+	if !ok {
+		return
+	}
+
+	filter := bson.M{"_id": objID}
+	update := bson.M{"$set": bson.M{"BrewID": nil}}
+
+	result, err := kc.collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// do some stuff
+	fmt.Println(result)
+	c.JSON(http.StatusOK, result)
+}
+
+// HandleKegAction ...
+func (kc *KegController) HandleKegAction(c *gin.Context) {
+	action := c.Param("action")
+	fmt.Println("Action:", action)
+	if action == "/fill" {
+		kc.FillKeg(c)
+		return
+	}
+	if action == "/drain" {
+		kc.DrainKeg(c)
+		return
+	}
+	if action == "/resethistory" {
+		kc.ResetHistory(c)
+		return
+	}
 	ki := models.KegInfo{}
 	ki.TimeStamp = time.Now()
 	ki.Action = trimFirstRune(c.Param("action"))
@@ -98,9 +188,9 @@ func (kc *KegController) HandleKegAction(c *gin.Context) {
 	fmt.Println("KI:", ki)
 	// i could switch on the action, and use
 
-	var anyJson map[string]interface{}
-	json.NewDecoder(c.Request.Body).Decode(&anyJson)
-	j, err := json.Marshal(anyJson)
+	var anyJSON map[string]interface{}
+	json.NewDecoder(c.Request.Body).Decode(&anyJSON)
+	j, err := json.Marshal(anyJSON)
 	fmt.Println(j, err)
 	ki.Data = j //anyJson //maybe?
 
@@ -119,8 +209,8 @@ func (kc *KegController) HandleKegAction(c *gin.Context) {
 	}
 	fmt.Println("result: ", result)
 
-	c.String(http.StatusOK, "added")
-	//c.JSON(http.StatusOK, k)
+	//c.String(http.StatusOK, "added")
+	c.JSON(http.StatusOK, result)
 
 }
 

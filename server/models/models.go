@@ -15,12 +15,18 @@ type KegInfo struct {
 	Data      interface{} `json:"data"`
 }
 
+// KegFillInfo ...
+type KegFillInfo struct {
+	BrewID primitive.ObjectID `json:"brewID"`
+}
+
 // Keg struct
 type Keg struct {
-	ID      primitive.ObjectID `json:"id" bson:"_id"`
-	Size    int                `json:"size"`
-	Code    string             `json:"code"`
-	History []KegInfo          `json:"history"`
+	ID      primitive.ObjectID  `json:"id" bson:"_id"`
+	Size    int                 `json:"size"`
+	Code    string              `json:"code"`
+	BrewID  *primitive.ObjectID `json:"brewID"`
+	History []KegInfo           `json:"history"`
 }
 
 // KegPurchase -- do i care about the ID? (need better name)
@@ -39,11 +45,24 @@ type Customer struct {
 	//phone #
 }
 
-// Transaction:
+// Transaction ...
 type Transaction struct {
 	ID         primitive.ObjectID `json:"id" bson:"_id"`
 	CustomerID primitive.ObjectID `json:"customerID"`
 	KegID      primitive.ObjectID `json:"kegID"`
+	BrewID     primitive.ObjectID `json:"brewID"`
 	Created    time.Time          `json:"created"`
 	Type       string             `json:"type"`
+}
+
+// Brew ...
+type Brew struct {
+	ID          primitive.ObjectID `json:"id" bson:"_id"`
+	Name        string             `json:"name"`
+	Style       string             `json:"style"`
+	ABV         float32            `json:"abv"`
+	IBU         int                `json:"ibu"`
+	Description string             `json:"description"`
+	Notes       string             `json:"notes"`
+	BrewDate    time.Time          `json:"brewDate"`
 }

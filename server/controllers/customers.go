@@ -67,7 +67,7 @@ func (cc *CustomerController) GetAllCustomers(c *gin.Context) {
 	c.JSON(http.StatusOK, customers)
 }
 
-// GetCustomer
+// GetCustomer ...
 func (cc *CustomerController) GetCustomer(c *gin.Context) {
 
 	objID, ok := extractId(c)
@@ -140,6 +140,7 @@ func (cc *CustomerController) DeleteCustomer(c *gin.Context) {
 	}
 }
 
+// PurchaseKeg ...
 func (cc *CustomerController) PurchaseKeg(c *gin.Context) {
 
 	objID, ok := extractId(c)
@@ -169,7 +170,7 @@ func (cc *CustomerController) PurchaseKeg(c *gin.Context) {
 	}
 }
 
-// ReturnKeg
+// ReturnKeg ...
 func (cc *CustomerController) ReturnKeg(c *gin.Context) {
 
 	objID, ok := extractId(c)
@@ -213,4 +214,30 @@ func (cc *CustomerController) KegTransaction(c *gin.Context) {
 		c.String(http.StatusBadRequest, "Unsupported action:")
 	}
 
+}
+
+// AllCustomersWithKegs
+func (cc *CustomerController) AllCustomersWithKegs(c *gin.Context) {
+
+	query := bson.M{"kegs": bson.M{"$not": bson.M{"$size": 0}}}
+
+	cur, err := cc.collection.Find(context.Background(), query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cur.Close(context.Background())
+
+	customers := []models.Customer{}
+
+	for cur.Next(context.Background()) {
+
+		customer := models.Customer{}
+		err := cur.Decode(&customer)
+		if err != nil {
+			log.Fatal(err)
+		}
+		customers = append(customers, customer)
+	}
+
+	c.JSON(http.StatusOK, customers)
 }
