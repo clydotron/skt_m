@@ -38,6 +38,7 @@ func (app *applicationX) initRoutes() {
 	router.GET("/api/v1/customers/:id", app.cc.GetCustomer)
 	router.PATCH("/api/v1/customers/:id", app.cc.UpdateCustomer)
 	router.DELETE("/api/v1/customers/:id", app.cc.DeleteCustomer)
+	router.GET("/api/v1/customerswk", app.cc.AllCustomersWithKegs)
 
 	v1.POST("/customers/:id/*action", app.cc.KegTransaction)
 
@@ -79,7 +80,13 @@ func (app *applicationX) initRoutes() {
 		v1.POST("/kegs/:id/*action", app.kc.HandleKegAction)
 		v1.DELETE("/kegs/:id", app.kc.DeleteKeg)
 	}
-	//router.GET("/api/v1/kegs", app.kc.GetAllKegs)
 
+	{
+		v1.GET("/brews", app.bc.GetAllBrews)
+		v1.POST("/brews", app.bc.CreateBrew)
+		v1.GET("/brews/:id", app.bc.GetBrew)
+		//v1.POST("/brews/:id/*action", app.kc.HandleKegAction)
+		//v1.DELETE("/brews/:id", app.kc.DeleteKeg)
+	}
 	router.Run()
 }

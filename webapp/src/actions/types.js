@@ -16,4 +16,12 @@ export const FETCH_KEGS = "FETCH_KEGS";
 export const DELETE_KEG = "DELETE_KEG";
 export const EDIT_KEG = "EDIT_KEG";
 
-export const CREATE_BEER = "CREATE_BEER";
+export const CREATE_BREW = "CREATE_BREW";
+export const FETCH_BREW = "FETCH_BREW";
+export const FETCH_BREWS = "FETCH_BREWS";
+export const DELETE_BREW = "DELETE_BREW";
+export const EDIT_BREW = "EDIT_BREW";
+
+export const FETCH_CUSTOMERS_WITH_KEGS = "FETCH_CUSTOMERS_WITH_KEGS";
+
+export const RECORD_TRANSACTION = "RECORD_TRANSACTION";
